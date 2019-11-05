@@ -15,20 +15,35 @@ prefCityCombo = soup.find('span', attrs={
 data["pref"] = pref
 data["city"] = city
 
-dataContent = urllib.request.urlopen(dataURL)
-soup = BeautifulSoup(dataContent, features="html.parser")
 
-for tr in soup.findAll('tr', attrs={"class": "mtx"}):
-    year = tr.find('a').text.strip()
-    yearTemps = []
+def getCityTemps(dataURL):
+    content = urllib.request.urlopen(dataURL)
+    soup = BeautifulSoup(content, features="html.parser")
+    tempsByYear = {}
 
-    for td in tr.findAll('td', attrs={'class': 'data_0_0_0_0'}):
-        temp = td.text.strip()
-        if temp != '':
-            temp = temp.split()[0]
-        yearTemps.append(temp)
+    for tr in soup.findAll('tr', attrs={"class": "mtx"}):
+        year = tr.find('a').text.strip()
+        tempsByMonth = []
 
-    data[year] = yearTemps
+        for td in tr.findAll('td', attrs={'class': 'data_0_0_0_0'}):
+            temp = td.text.strip()
+            if temp != '':
+                temp = temp.split()[0]
+            tempsByMonth.append(temp)
 
-with open(f'{prefCityCombo}.json', 'w', encoding="utf-8") as json_file:
-    json.dump(data, json_file, indent=4, ensure_ascii=False)
+        tempsByYear[year] = tempsByMonth
+
+    return tempsByYear
+
+
+def outputDataAsJSON(data):
+    with open("data.json", 'w', encoding="utf-8") as json_file:
+        json.dump(data, json_file, indent=4, ensure_ascii=False)
+
+
+def main():
+    data = getCityTemps(dataURL)
+    outputDataAsJSON(data)
+
+
+main()
