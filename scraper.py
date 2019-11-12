@@ -51,10 +51,13 @@ def getCityTemps(dataURL):
         year = tr.find('a').text.strip()
         tempsByMonth = []
 
-        for td in tr.findAll('td', attrs={'class': 'data_0_0_0_0'}):
+        for td in tr.findAll(
+                'td', attrs={'class': ['data_0_0_0_0', 'data_1t_0_0_0', 'data_1t_0_0_1l']}):
             temp = td.text.strip()
             if temp != '':
                 temp = temp.split()[0]
+            if temp == "×":
+                temp = ""
             tempsByMonth.append(temp)
 
         tempsByYear[year] = tempsByMonth
@@ -74,6 +77,7 @@ def main():
     for prefName, prefLink in prefectures.items():
         cityData = {}
         cities = getAllPrefCities(prefLink)
+        print(f"On {prefName}")
 
         for cityName, cityLink in cities.items():
             tempDataLink = getTempDataLink(cityLink)
