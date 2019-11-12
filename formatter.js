@@ -47,7 +47,7 @@ function convertToAverageTemp(data) {
   for (let [year, yearData] of Object.entries(hokkaidoAggregate)) {
     averageHokkaidoTemps[year] = averageArrayValuesInMatrix(yearData);
   }
-  formattedData["北海度"] = averageHokkaidoTemps;
+  formattedData["北海道"] = averageHokkaidoTemps;
 
   return formattedData;
 }
