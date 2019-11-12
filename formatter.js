@@ -3,8 +3,10 @@ const data = JSON.parse(fs.readFileSync("./data.json", "utf-8"));
 
 function convertToAverageTemp(data) {
   const formattedData = {
-    oldestYear: Infinity,
-    newestYear: -Infinity
+    minYear: Infinity,
+    maxYear: -Infinity,
+    minTemperature: Infinity,
+    maxTemperature: -Infinity
   };
   const hokkaidoAggregate = {};
 
@@ -13,13 +15,6 @@ function convertToAverageTemp(data) {
 
     for (let cityData of Object.values(prefData)) {
       for (let [year, temp] of Object.entries(cityData)) {
-        if (+year < formattedData.oldestYear) {
-          formattedData.oldestYear = +year;
-        }
-        if (+year > formattedData.newestYear) {
-          formattedData.newestYear = +year;
-        }
-
         if (pref.match("方")) {
           hokkaidoAggregate[year]
             ? hokkaidoAggregate[year].push(temp)
@@ -49,6 +44,8 @@ function convertToAverageTemp(data) {
   }
   formattedData["北海道"] = averageHokkaidoTemps;
 
+  AddMinMaxValues(formattedData);
+
   return formattedData;
 }
 
@@ -70,6 +67,19 @@ function averageArrayValuesInMatrix(matrix) {
   }
 
   return averageArray;
+}
+
+function AddMinMaxValues(data) {
+  for (let prefData of Object.values(data)) {
+    for (let [year, monthlyTemp] of Object.entries(prefData)) {
+      if (+year > data.maxYear) data.maxYear = +year;
+      if (+year < data.minYear) data.minYear = +year;
+      monthlyTemp.forEach(temp => {
+        if (+temp > data.maxTemperature) data.maxTemperature = +temp;
+        if (+temp < data.minTemperature) data.minTemperature = +temp;
+      });
+    }
+  }
 }
 
 const formattedJSON = JSON.stringify(convertToAverageTemp(data), null, 4);
